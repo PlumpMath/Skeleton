@@ -236,6 +236,8 @@ class View
 			$directories[] = $source;
 		}
 
+		//loop through directories referenced by $this->sources
+		//and find files to watch
 		for ($i = 0; $i < count($directories); $i++) {
 			$directory = $directories[$i];
 
@@ -265,6 +267,8 @@ class View
 		$this->shout(NEWLINE, null);
 		$this->shout(POLLING, null);
 
+		//poll for changes by monitoring
+		//the files' modified dates
 		while (1) {
 			foreach ($files as $file => $time) {
 				if (file_exists($file)) {
