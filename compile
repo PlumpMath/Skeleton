@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php
+
+require 'lib/View.php';
+
+$tumblrTheme = new View('Skeleton');
+
+//turn messages on
+/**/$tumblrTheme->report();/**/
+
+//turn messages off
+/** /$tumblrTheme->silent();/**/
+
+//where required files can be found
+$tumblrTheme->compileFrom([
+	'css' => 'style/',
+	'js' => 'app/',
+	'html' => 'templates/',
+]);
+
+//where to output the compiled file
+$tumblrTheme->compileTo('compiled/theme.html');
+
+//before compiling do these
+$tumblrTheme->beforeCompiling('compile SASS', function ()
+{
+	return `sass --no-cache --update style/main.sass:compiled/style/main.css`;
+});
+
+$tumblrTheme->beforeCompiling('concatenate JavaScript', function ()
+{
+	return `cat app/*.js > compiled/app/app.js`;
+});
+
+//and after compiling do this
+$tumblrTheme->afterCompiling('copy to clipboard', function ($HTML)
+{
+	return `echo "$HTML" | clip`;
+});
+
+//compile!
+/** /$tumblrTheme->compile();/**/
+
+//or poll for changes
+/**/$tumblrTheme->poll();/**/
