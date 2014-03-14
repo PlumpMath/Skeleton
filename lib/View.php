@@ -138,12 +138,33 @@ class View
 		return $text;
 	}
 
+	//determine whether path extension is recognized
+	protected function pathIsRecognized($path)
+	{
+		$recognized = false;
+
+		foreach($this->sources as $ext => $value) {
+			if ($path == $ext) $recognized = true;
+		}
+
+		return $recognized;
+	}
+
 	//locate a required file
 	protected function findFile($filename)
 	{
 		$full_path_file = false;
+		$path_is_recognized = false;
+
+		$path = pathinfo($filename, PATHINFO_EXTENSION);
+		
+		if ($this->pathIsRecognized($path)) {
+			$path_is_recognized = true;
+			$filename = str_replace('.'.$path, '', $filename);
+		}
 
 		$filename = implode(DIRECTORY_SEPARATOR, explode('.', $filename));
+		$filename = ($path && $path_is_recognized) ? $filename.'.'.$path : $filename;
 
 		if (pathinfo($filename, PATHINFO_EXTENSION) == null) $filename .= ".html";
 
@@ -317,7 +338,7 @@ class View
 				'filename' => $matches[0]
 			]);
 			$file = $this->findFile($matches[0]);
-			$file = $this->getRequired($file);
+			$file = trim($this->getRequired($file));
 
 			$HTML = preg_replace($require_pattern, $file, $template, 1);
 
