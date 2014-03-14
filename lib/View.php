@@ -323,22 +323,45 @@ class View
 		return '/@require\(\'(.*)\'\)/';
 	}
 
+	//pattern to detect a require call
+	protected function requireTabsPattern()
+	{
+		return '/\t*@require\(\'(.*)\'\)/';
+	}
+
 	//recursively settle all require calls
 	//and build the final file
 	protected function build($template)
 	{
 		$require_pattern = $this->requirePattern();
+		$require_tabs_pattern = $this->requireTabsPattern();
 
 		$matches = [];
+		$number_of_tabs = [];
+		$tabs = '';
 
 		if (preg_match($require_pattern, $template, $matches)) {
+			preg_match($require_tabs_pattern, $template, $number_of_tabs);
+			$number_of_tabs = strspn($number_of_tabs[0], "\t");
+
+			for ($i = 0; $i < $number_of_tabs; $i++) $tabs .= "\t";
+
 			$matches[0] = preg_replace($require_pattern, '$1', $matches[0]);
 
 			$this->shout(LOOKING_FOR, [
 				'filename' => $matches[0]
 			]);
+
 			$file = $this->findFile($matches[0]);
 			$file = trim($this->getRequired($file));
+
+			$lines = explode(PHP_EOL, $file);
+
+			foreach ($lines as $key => $line) {
+				if ($key > 0) $lines[$key] = $tabs.$line;
+			}
+
+			$file = implode(PHP_EOL, $lines);
 
 			$HTML = preg_replace($require_pattern, $file, $template, 1);
 
