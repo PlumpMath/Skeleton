@@ -39,7 +39,7 @@ Skeleton will attempt to find a template called `foo/bar.html`. Check out the ex
 
 ### Skeleton can poll a series of source directories for changes.
 
-This is the coolest part of Skeleton. It will pull any directories you indicate with `compileFrom()` and scan all the files of those directories (and all sub-directories) for changes.
+This is the coolest part of Skeleton. It will pull any directories you indicate with `watch()` and scan all the files of those directories (and all sub-directories) for changes.
 
 On detecting a change, Skeleton will compile your code and copy the end result to your clipboard, as well as saving the output to a file you designate with `compileTo()`.
 
