@@ -21,6 +21,13 @@ $tumblrTheme->compileFrom([
 //where to output the compiled file
 $tumblrTheme->compileTo('compiled/theme.html');
 
+//which files to watch for polling
+$tumblrTheme->watch([
+	'app/',
+	'style/',
+	'templates/',
+]);
+
 //before compiling do these
 $tumblrTheme->beforeCompiling('compile SASS', function ()
 {
@@ -42,7 +49,7 @@ $tumblrTheme->afterCompiling('copy to clipboard', function ($HTML)
 });
 
 //compile!
-/**/$tumblrTheme->compile();/**/
+/** /$tumblrTheme->compile();/**/
 
 //or poll for changes
-/** /$tumblrTheme->poll();/**/
+/**/$tumblrTheme->poll();/**/

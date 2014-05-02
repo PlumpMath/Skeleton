@@ -57,8 +57,11 @@ class View
 	//file to save compilation to
 	protected $output_file = 'compiled.html';
 
-	//sources to poll for changes
+	//sources
 	protected $sources;
+
+	//directories to watch for changes
+	protected $watched;
 
 	//base template
 	protected $template;
@@ -183,6 +186,12 @@ class View
 		return $full_path_file;
 	}
 
+	//directories to watch
+	public function watch($directories)
+	{
+		$this->watched = $directories;
+	}
+
 	//where files to build from can be found
 	public function compileFrom($sources)
 	{
@@ -249,15 +258,15 @@ class View
 		$directories = [];
 		$files = [];
 
-		foreach ($this->sources as $source) {
+		foreach ($this->watched as $file) {
 			$this->shout(DIRECTORY_FOUND, [
-				"directory" => $source,
+				"directory" => $file,
 			]);
 
-			$directories[] = $source;
+			$directories[] = $file;
 		}
 
-		//loop through directories referenced by $this->sources
+		//loop through directories referenced by $this->watched
 		//and find files to watch
 		for ($i = 0; $i < count($directories); $i++) {
 			$directory = $directories[$i];
