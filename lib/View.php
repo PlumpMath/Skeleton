@@ -93,7 +93,7 @@ class View
 			"Detected reference to [%filename%]\nLocating file...",
 			"Skeleton is watching for changes...",
 			"Searching directory [%directory%]...",
-			"Watching file [%filename%]",
+			"\t".GREEN."Watching file [".RESET."%filename%".GREEN"]".RESET,
 			YELLOW."Detected change in [".RESET."%filename%".YELLOW."]\n",
 			"Postcompile: [%directive%]",
 			"\n",
