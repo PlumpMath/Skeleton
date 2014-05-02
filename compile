@@ -35,6 +35,9 @@ $tumblrTheme->beforeCompiling('concatenate JavaScript', function ()
 //and after compiling do this
 $tumblrTheme->afterCompiling('copy to clipboard', function ($HTML)
 {
+	//escape quotation marks
+	$HTML = str_replace('"', '\"', $HTML);
+
 	return `echo "$HTML" | clip`;
 });
 
