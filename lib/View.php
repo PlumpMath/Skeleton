@@ -255,6 +255,9 @@ class View
 	public function poll()
 	{
 
+		$this->shout(POLLING, null);
+		$this->shout(NEWLINE, null);
+
 		$directories = [];
 		$files = [];
 
@@ -266,40 +269,41 @@ class View
 			$directories[] = $file;
 		}
 
-		//loop through directories referenced by $this->watched
-		//and find files to watch
-		for ($i = 0; $i < count($directories); $i++) {
-			$directory = $directories[$i];
-
-			if ($handle = opendir($directory)) {
-				while(($file = readdir($handle)) !== false) {
-					if ($file !== '..' && $file !== '.') {
-						if (is_dir($directory.$file)) {
-							$this->shout(DIRECTORY_FOUND, [
-								"directory" => $directory.$file.DIRECTORY_SEPARATOR,
-							]);
-
-							$directories[] = $directory.$file.DIRECTORY_SEPARATOR;
-						} else {
-							$this->shout(WATCHING, [
-								"filename" => $directory.$file,
-							]);
-
-							$files[$directory.$file] = filemtime($directory.$file);
-						}
-					}
-				}
-
-				closedir($handle);
-			}
-		}
-
-		$this->shout(NEWLINE, null);
-		$this->shout(POLLING, null);
-
 		//poll for changes by monitoring
 		//the files' modified dates
 		while (1) {
+
+			//loop through directories referenced by $this->watched
+			//and find files to watch
+			for ($i = 0; $i < count($directories); $i++) {
+				$directory = $directories[$i];
+				if ($handle = opendir($directory)) {
+					while(($file = readdir($handle)) !== false) {
+						if ($file !== '..' && $file !== '.'
+							&& preg_match('/^\./', $file) == 0
+							&& preg_match('/~$/', $file) == 0) {
+							if (is_dir($directory.$file)) {
+								if (! in_array($directory.$file.DIRECTORY_SEPARATOR, $directories)) {
+									$this->shout(DIRECTORY_FOUND, [
+										"directory" => $directory.$file.DIRECTORY_SEPARATOR,
+									]);
+
+									$directories[] = $directory.$file.DIRECTORY_SEPARATOR;
+								}
+							} else if ( ! isset($files[$directory.$file])) {
+								$this->shout(WATCHING, [
+									"filename" => $directory.$file,
+								]);
+
+								$files[$directory.$file] = filemtime($directory.$file);
+							}
+						}
+					}
+
+					closedir($handle);
+				}
+			}
+
 			foreach ($files as $file => $time) {
 				if (file_exists($file)) {
 					if (filemtime($file) > $time) {
@@ -310,6 +314,7 @@ class View
 						$this->compile();
 
 						$this->shout(POLLING, null);
+						$this->shout(NEWLINE, null);
 
 						$files[$file] = filemtime($file);
 					}
@@ -321,8 +326,6 @@ class View
 					unset($files[$file]);
 				}
 			}
-
-			sleep(1);
 		}
 	}
 
